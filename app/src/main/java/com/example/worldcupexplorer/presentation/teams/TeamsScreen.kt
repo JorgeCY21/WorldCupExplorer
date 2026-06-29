@@ -106,7 +106,7 @@ private fun TeamCard(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             AppImage(
-                imageUrl = team.flagUrl ?: team.countryCode.toCountryFlagUrl() ?: team.crestUrl,
+                imageUrl = team.countryCode.toCountryFlagUrl() ?: team.flagUrl ?: team.crestUrl,
                 contentDescription = "${team.name} flag",
                 modifier = Modifier
                     .size(72.dp)

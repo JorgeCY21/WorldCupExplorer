@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.worldcupexplorer.domain.model.Match
 import com.example.worldcupexplorer.presentation.common.UiState
+import com.example.worldcupexplorer.presentation.common.toCountryFlagUrl
 import com.example.worldcupexplorer.presentation.components.AppBackground
 import com.example.worldcupexplorer.presentation.components.AppImage
 import com.example.worldcupexplorer.presentation.components.AppTopBar
@@ -116,7 +117,7 @@ private fun MatchCard(match: Match) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 AppImage(
-                    imageUrl = match.homeTeam.crestUrl,
+                    imageUrl = match.homeTeam.name.toCountryFlagUrl() ?: match.homeTeam.crestUrl,
                     contentDescription = match.homeTeam.name,
                     modifier = Modifier.size(48.dp)
                 )
@@ -126,7 +127,7 @@ private fun MatchCard(match: Match) {
                     color = MaterialTheme.colorScheme.primary
                 )
                 AppImage(
-                    imageUrl = match.awayTeam.crestUrl,
+                    imageUrl = match.awayTeam.name.toCountryFlagUrl() ?: match.awayTeam.crestUrl,
                     contentDescription = match.awayTeam.name,
                     modifier = Modifier.size(48.dp)
                 )

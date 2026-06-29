@@ -51,11 +51,13 @@ fun MatchDto.toDomain(): Match {
         homeTeam = MatchTeam(
             id = homeTeam.id,
             name = homeTeam.name.orEmpty(),
+            countryCode = homeTeam.area?.code,
             crestUrl = homeTeam.crest
         ),
         awayTeam = MatchTeam(
             id = awayTeam.id,
             name = awayTeam.name.orEmpty(),
+            countryCode = awayTeam.area?.code,
             crestUrl = awayTeam.crest
         ),
         utcDate = utcDate,
@@ -92,6 +94,7 @@ fun StandingDto.toDomain(): StandingEntry {
         team = MatchTeam(
             id = team?.id ?: 0,
             name = team?.name.orEmpty(),
+            countryCode = team?.area?.code,
             crestUrl = team?.crest
         ),
         playedGames = playedGames,
@@ -110,6 +113,7 @@ fun ScorerDto.toDomain(rank: Int): Scorer {
         team = MatchTeam(
             id = team?.id ?: 0,
             name = team?.name.orEmpty(),
+            countryCode = team?.area?.code,
             crestUrl = team?.crest
         ),
         goals = goals
