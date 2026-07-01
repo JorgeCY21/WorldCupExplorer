@@ -9,6 +9,7 @@ import com.example.worldcupexplorer.navigation.AppDestination
 import com.example.worldcupexplorer.presentation.common.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,6 +23,7 @@ class TeamDetailsViewModel @Inject constructor(
 
     private val teamId: Int = savedStateHandle.get<Int>(AppDestination.TeamDetailsArg) ?: 0
 
+    private var loadJob: Job? = null
     private val _uiState = MutableStateFlow<UiState<Team>>(UiState.Loading)
     val uiState: StateFlow<UiState<Team>> = _uiState.asStateFlow()
 
@@ -30,7 +32,8 @@ class TeamDetailsViewModel @Inject constructor(
     }
 
     fun loadTeamDetails() {
-        viewModelScope.launch {
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
             _uiState.value = UiState.Loading
             if (teamId == 0) {
                 _uiState.value = UiState.Error("Missing team id.")

@@ -6,6 +6,7 @@ import com.example.worldcupexplorer.domain.repository.FootballRepository
 import com.example.worldcupexplorer.presentation.common.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,6 +17,7 @@ class AboutViewModel @Inject constructor(
     private val repository: FootballRepository
 ) : ViewModel() {
 
+    private var loadJob: Job? = null
     private val _uiState = MutableStateFlow<UiState<AboutUiModel>>(UiState.Loading)
     val uiState: StateFlow<UiState<AboutUiModel>> = _uiState.asStateFlow()
 
@@ -24,7 +26,8 @@ class AboutViewModel @Inject constructor(
     }
 
     fun loadAbout() {
-        viewModelScope.launch {
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
             _uiState.value = UiState.Loading
             repository.getCompetition().collect { result ->
                 _uiState.value = result.fold(

@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.safeDrawing
 import coil.compose.AsyncImage
+import com.example.worldcupexplorer.presentation.common.LocalConnectivityStatus
 import com.example.worldcupexplorer.presentation.common.UiState
 import com.example.worldcupexplorer.ui.theme.WorldCupBlue
 import com.example.worldcupexplorer.ui.theme.WorldCupGold
@@ -133,20 +134,58 @@ fun AppTopBar(
     title: String,
     onBackClick: (() -> Unit)? = null
 ) {
-    CenterAlignedTopAppBar(
-        title = { Text(text = title) },
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background
-        ),
-        windowInsets = WindowInsets.safeDrawing,
-        navigationIcon = {
-            if (onBackClick != null) {
-                IconButton(onClick = onBackClick) {
-                    Text(text = "<", style = MaterialTheme.typography.titleLarge)
+    Column {
+        CenterAlignedTopAppBar(
+            title = { Text(text = title) },
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = MaterialTheme.colorScheme.background
+            ),
+            windowInsets = WindowInsets.safeDrawing,
+            navigationIcon = {
+                if (onBackClick != null) {
+                    IconButton(onClick = onBackClick) {
+                        Text(text = "<", style = MaterialTheme.typography.titleLarge)
+                    }
                 }
             }
+        )
+        ConnectivityBanner()
+    }
+}
+
+@Composable
+fun ConnectivityBanner() {
+    val isOnline = LocalConnectivityStatus.current
+    val background = if (isOnline) {
+        WorldCupGreen.copy(alpha = 0.16f)
+    } else {
+        WorldCupRed.copy(alpha = 0.16f)
+    }
+    val contentColor = if (isOnline) WorldCupGreen else WorldCupRed
+    val label = if (isOnline) "Online" else "Offline - Showing cached data"
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        shape = RoundedCornerShape(999.dp),
+        colors = CardDefaults.cardColors(containerColor = background),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelLarge,
+                color = contentColor
+            )
         }
-    )
+    }
 }
 
 @Composable
