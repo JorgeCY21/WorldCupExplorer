@@ -32,9 +32,10 @@ object LocalModule {
             .build()
     }
 
+    @ApplicationScope
     @Provides
     @Singleton
     fun provideApplicationScope(): CoroutineScope {
-        return CoroutineScope(SupervisorJob() + Dispatchers.IO)
+        return CoroutineScope(SupervisorJob() + Dispatchers.Default)
     }
 }
