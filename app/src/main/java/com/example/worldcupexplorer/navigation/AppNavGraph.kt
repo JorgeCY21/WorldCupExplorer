@@ -34,8 +34,8 @@ import com.example.worldcupexplorer.presentation.teams.TeamsViewModel
 
 @Composable
 fun AppNavGraph(
-    pendingTeamId: Int? = null,
-    onPendingTeamIdConsumed: () -> Unit = {}
+    pendingRoute: String? = null,
+    onPendingRouteConsumed: () -> Unit = {}
 ) {
     val navController = rememberNavController()
     val connectivityViewModel: ConnectivityViewModel = hiltViewModel()
@@ -43,10 +43,10 @@ fun AppNavGraph(
     val notificationsViewModel: NotificationsViewModel = hiltViewModel()
     val lastPushMessage = notificationsViewModel.lastMessage.collectAsStateWithLifecycle().value
 
-    LaunchedEffect(pendingTeamId) {
-        if (pendingTeamId != null) {
-            navController.navigate(AppDestination.teamDetailsRoute(pendingTeamId))
-            onPendingTeamIdConsumed()
+    LaunchedEffect(pendingRoute) {
+        if (pendingRoute != null) {
+            navController.navigate(pendingRoute)
+            onPendingRouteConsumed()
         }
     }
 

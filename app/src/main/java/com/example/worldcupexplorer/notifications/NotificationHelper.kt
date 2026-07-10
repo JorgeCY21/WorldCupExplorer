@@ -73,6 +73,8 @@ class NotificationHelper @Inject constructor(
     companion object {
         const val CHANNEL_ID = "world_cup_channel"
         const val EXTRA_TEAM_ID = "teamId"
+        const val EXTRA_DESTINATION = "destination"
+        const val DESTINATION_MATCHES = "matches"
         private const val CHANNEL_NAME = "World Cup Explorer"
         private const val CHANNEL_DESCRIPTION = "Notificaciones del Mundial"
         private const val NOTIFICATION_ID = 1

@@ -15,29 +15,44 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
+import com.example.worldcupexplorer.navigation.AppDestination
 import com.example.worldcupexplorer.navigation.AppNavGraph
+import com.example.worldcupexplorer.notifications.LiveMatchScheduler
 import com.example.worldcupexplorer.notifications.NotificationHelper
 import com.example.worldcupexplorer.ui.theme.WorldCupExplorerTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private var pendingTeamId by mutableStateOf<Int?>(null)
+    @Inject
+    lateinit var liveMatchScheduler: LiveMatchScheduler
+
+    private var pendingRoute by mutableStateOf<String?>(null)
 
     private val notificationPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            // Recien aqui hay permiso: el chequeo inmediato ya puede notificar.
+            if (granted) {
+                startLiveMatchChecks()
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        askNotificationPermission()
-        pendingTeamId = intent.teamIdExtra()
+        if (hasNotificationPermission()) {
+            startLiveMatchChecks()
+        } else {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+        pendingRoute = intent.pendingRouteExtra()
         setContent {
             WorldCupExplorerTheme {
                 AppNavGraph(
-                    pendingTeamId = pendingTeamId,
-                    onPendingTeamIdConsumed = { pendingTeamId = null }
+                    pendingRoute = pendingRoute,
+                    onPendingRouteConsumed = { pendingRoute = null }
                 )
             }
         }
@@ -45,24 +60,33 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        pendingTeamId = intent.teamIdExtra()
+        pendingRoute = intent.pendingRouteExtra()
     }
 
-    private fun askNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-        }
+    private fun hasNotificationPermission(): Boolean =
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+            PackageManager.PERMISSION_GRANTED
+
+    private fun startLiveMatchChecks() {
+        liveMatchScheduler.start(
+            simulateFirstCheck = intent.getBooleanExtra(EXTRA_SIMULATE_LIVE_CHECK, false)
+        )
     }
 
-    private fun Intent.teamIdExtra(): Int? =
-        if (hasExtra(NotificationHelper.EXTRA_TEAM_ID)) {
-            getIntExtra(NotificationHelper.EXTRA_TEAM_ID, -1).takeIf { it >= 0 }
-        } else {
-            null
-        }
+    private fun Intent.pendingRouteExtra(): String? = when {
+        hasExtra(NotificationHelper.EXTRA_TEAM_ID) ->
+            getIntExtra(NotificationHelper.EXTRA_TEAM_ID, -1)
+                .takeIf { it >= 0 }
+                ?.let { AppDestination.teamDetailsRoute(it) }
+        getStringExtra(NotificationHelper.EXTRA_DESTINATION) == NotificationHelper.DESTINATION_MATCHES ->
+            AppDestination.MatchesRoute
+        else -> null
+    }
+
+    private companion object {
+        const val EXTRA_SIMULATE_LIVE_CHECK = "simulateLiveCheck"
+    }
 }
 
 @Preview(showBackground = true)
