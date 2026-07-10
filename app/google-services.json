@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "000000000000",
-    "project_id": "placeholder-project",
-    "storage_bucket": "placeholder-project.appspot.com"
+    "project_number": "11240905069",
+    "project_id": "worldcup-explorer-jcy21",
+    "storage_bucket": "worldcup-explorer-jcy21.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
+        "mobilesdk_app_id": "1:11240905069:android:ffa4dc1ad0334cca2ba264",
         "android_client_info": {
           "package_name": "com.example.worldcupexplorer"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA-placeholder-key-0000000000000000"
+          "current_key": "AIzaSyAhZrvP0H0-UGjxitfhgT8uqvRN9XIHM-w"
         }
       ],
       "services": {
