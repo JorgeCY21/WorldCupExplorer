@@ -42,10 +42,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        if (hasNotificationPermission()) {
-            startLiveMatchChecks()
-        } else {
-            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        when {
+            hasNotificationPermission() -> startLiveMatchChecks()
+            // Solo se pregunta la primera vez; si el usuario nego, se respeta.
+            !notificationPermissionAlreadyRequested() -> {
+                markNotificationPermissionRequested()
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
         }
         pendingRoute = intent.pendingRouteExtra()
         setContent {
@@ -74,6 +77,13 @@ class MainActivity : ComponentActivity() {
         )
     }
 
+    private fun notificationPermissionAlreadyRequested(): Boolean =
+        getPreferences(MODE_PRIVATE).getBoolean(PREF_PERMISSION_REQUESTED, false)
+
+    private fun markNotificationPermissionRequested() {
+        getPreferences(MODE_PRIVATE).edit().putBoolean(PREF_PERMISSION_REQUESTED, true).apply()
+    }
+
     private fun Intent.pendingRouteExtra(): String? = when {
         hasExtra(NotificationHelper.EXTRA_TEAM_ID) ->
             getIntExtra(NotificationHelper.EXTRA_TEAM_ID, -1)
@@ -86,6 +96,7 @@ class MainActivity : ComponentActivity() {
 
     private companion object {
         const val EXTRA_SIMULATE_LIVE_CHECK = "simulateLiveCheck"
+        const val PREF_PERMISSION_REQUESTED = "notification_permission_requested"
     }
 }
 

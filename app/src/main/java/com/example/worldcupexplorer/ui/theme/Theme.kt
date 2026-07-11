@@ -12,10 +12,14 @@ import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
     primary = WorldCupRedDark,
+    primaryContainer = WorldCupRed.copy(alpha = 0.35f),
+    onPrimaryContainer = WorldCupGoldDark,
     secondary = WorldCupGoldDark,
+    secondaryContainer = WorldCupGoldDark.copy(alpha = 0.18f),
+    onSecondaryContainer = WorldCupGoldDark,
     tertiary = WorldCupGreenDark,
     background = WorldCupSurfaceDark,
-    surface = WorldCupSurfaceDark,
+    surface = WorldCupCardDark,
     surfaceVariant = WorldCupBlueDark.copy(alpha = 0.18f),
     outline = WorldCupBlueDark.copy(alpha = 0.35f),
     onPrimary = WorldCupSurfaceDark,
@@ -28,11 +32,15 @@ private val DarkColorScheme = darkColorScheme(
 
 private val LightColorScheme = lightColorScheme(
     primary = WorldCupRed,
+    primaryContainer = WorldCupRed.copy(alpha = 0.10f),
+    onPrimaryContainer = WorldCupRed,
     secondary = WorldCupGold,
+    secondaryContainer = WorldCupGold.copy(alpha = 0.22f),
+    onSecondaryContainer = WorldCupBlue,
     tertiary = WorldCupGreen,
     background = WorldCupSurface,
-    surface = WorldCupSurface,
-    surfaceVariant = WorldCupBlue.copy(alpha = 0.08f),
+    surface = WorldCupCard,
+    surfaceVariant = WorldCupSand,
     outline = WorldCupBlue.copy(alpha = 0.22f),
     onPrimary = WorldCupSurface,
     onSecondary = WorldCupBlue,

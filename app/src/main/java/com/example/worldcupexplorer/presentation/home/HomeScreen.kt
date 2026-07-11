@@ -3,18 +3,18 @@ package com.example.worldcupexplorer.presentation.home
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -22,12 +22,16 @@ import com.example.worldcupexplorer.domain.model.HomeDashboard
 import com.example.worldcupexplorer.presentation.common.UiState
 import com.example.worldcupexplorer.presentation.components.AppBackground
 import com.example.worldcupexplorer.presentation.components.AppTopBar
-import com.example.worldcupexplorer.presentation.components.CardSubtitle
 import com.example.worldcupexplorer.presentation.components.HeroBanner
 import com.example.worldcupexplorer.presentation.components.InfoCard
 import com.example.worldcupexplorer.presentation.components.NavigationCard
 import com.example.worldcupexplorer.presentation.components.ScreenStateContent
 import com.example.worldcupexplorer.presentation.components.SectionTitle
+import com.example.worldcupexplorer.ui.theme.WorldCupBlue
+import com.example.worldcupexplorer.ui.theme.WorldCupCrimson
+import com.example.worldcupexplorer.ui.theme.WorldCupGold
+import com.example.worldcupexplorer.ui.theme.WorldCupGreen
+import com.example.worldcupexplorer.ui.theme.WorldCupRed
 
 @Composable
 fun HomeScreen(
@@ -53,8 +57,8 @@ fun HomeScreen(
             ) { dashboard ->
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(14.dp)
                 ) {
                     item {
                         HeroBanner(
@@ -70,56 +74,46 @@ fun HomeScreen(
                             }
                         )
                     }
-                    item { SectionTitle(title = "Competition") }
+                    item { SeasonCard(dashboard) }
+                    item { SectionTitle(title = "Tournament stats") }
                     item {
-                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Text(
-                                text = "Current season",
-                                style = MaterialTheme.typography.labelLarge,
-                                color = MaterialTheme.colorScheme.tertiary
-                            )
-                            Text(
-                                text = dashboard.competition.currentSeason?.let { season ->
-                                    "${season.startDate.orDash()} to ${season.endDate.orDash()}"
-                                } ?: "N/A",
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                            CardSubtitle(
-                                text = "Matchday ${dashboard.competition.currentSeason?.currentMatchday?.toString() ?: "N/A"}"
-                            )
-                        }
-                    }
-                    item { SectionTitle(title = "Statistics") }
-                    item {
-                        androidx.compose.foundation.layout.Row(
+                        Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             InfoCard(
                                 title = "Teams",
                                 value = dashboard.teamsCount.toString(),
+                                emblem = "🛡️",
+                                accent = WorldCupBlue,
                                 modifier = Modifier.weight(1f)
                             )
                             InfoCard(
                                 title = "Matches",
                                 value = dashboard.matchesCount.toString(),
+                                emblem = "⚽",
+                                accent = WorldCupGreen,
                                 modifier = Modifier.weight(1f)
                             )
                         }
                     }
                     item {
-                        androidx.compose.foundation.layout.Row(
+                        Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             InfoCard(
                                 title = "Scorers",
                                 value = dashboard.scorersCount.toString(),
+                                emblem = "👟",
+                                accent = WorldCupCrimson,
                                 modifier = Modifier.weight(1f)
                             )
                             InfoCard(
                                 title = "Groups",
                                 value = dashboard.groupsCount.toString(),
+                                emblem = "🏟️",
+                                accent = WorldCupGold,
                                 modifier = Modifier.weight(1f)
                             )
                         }
@@ -129,6 +123,8 @@ fun HomeScreen(
                         NavigationCard(
                             title = "Teams",
                             subtitle = "Browse squads, coaches and crests",
+                            emblem = "🛡️",
+                            accent = WorldCupBlue,
                             onClick = onTeamsClick
                         )
                     }
@@ -136,6 +132,8 @@ fun HomeScreen(
                         NavigationCard(
                             title = "Matches",
                             subtitle = "Follow fixtures, times and scores",
+                            emblem = "⚽",
+                            accent = WorldCupGreen,
                             onClick = onMatchesClick
                         )
                     }
@@ -143,6 +141,8 @@ fun HomeScreen(
                         NavigationCard(
                             title = "Standings",
                             subtitle = "Check group tables at a glance",
+                            emblem = "📊",
+                            accent = WorldCupGold,
                             onClick = onStandingsClick
                         )
                     }
@@ -150,6 +150,8 @@ fun HomeScreen(
                         NavigationCard(
                             title = "Top Scorers",
                             subtitle = "See the scoring leaders",
+                            emblem = "🥇",
+                            accent = WorldCupCrimson,
                             onClick = onScorersClick
                         )
                     }
@@ -157,10 +159,56 @@ fun HomeScreen(
                         NavigationCard(
                             title = "About",
                             subtitle = "App and data credits",
+                            emblem = "ℹ️",
+                            accent = WorldCupRed,
                             onClick = onAboutClick
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SeasonCard(dashboard: HomeDashboard) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(18.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    text = "CURRENT SEASON",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = dashboard.competition.currentSeason?.let { season ->
+                        "${season.startDate.orDash()} → ${season.endDate.orDash()}"
+                    } ?: "N/A",
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                horizontalAlignment = androidx.compose.ui.Alignment.End
+            ) {
+                Text(
+                    text = "MATCHDAY",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = dashboard.competition.currentSeason?.currentMatchday?.toString() ?: "—",
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
         }
     }

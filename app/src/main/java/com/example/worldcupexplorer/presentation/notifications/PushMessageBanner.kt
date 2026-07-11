@@ -48,11 +48,11 @@ fun PushMessageBanner(
                 horizontalArrangement = Arrangement.End
             ) {
                 TextButton(onClick = onDismiss) {
-                    Text("Cerrar")
+                    Text("Dismiss")
                 }
                 if (message.teamId != null) {
                     TextButton(onClick = { onOpenTeam(message.teamId) }) {
-                        Text("Ver equipo")
+                        Text("View team")
                     }
                 }
             }

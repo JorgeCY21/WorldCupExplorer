@@ -67,9 +67,9 @@ class LiveMatchNotifier @Inject constructor(
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_stat_soccer)
             .setColor(ACCENT_COLOR)
-            .setContentTitle("🔴 EN VIVO · ${match.homeTeam.name} vs ${match.awayTeam.name}")
+            .setContentTitle("🔴 LIVE · ${match.homeTeam.name} vs ${match.awayTeam.name}")
             .setContentText("⚽ $score · ${match.stage.toStageDisplay()}")
-            .setSubText("Copa Mundial 2026")
+            .setSubText("World Cup 2026")
             .setLargeIcon(homeFlag)
             .setStyle(
                 NotificationCompat.BigPictureStyle()
@@ -92,10 +92,10 @@ class LiveMatchNotifier @Inject constructor(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "Partidos en vivo",
+                "Live matches",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Marcadores en vivo del Mundial cada 5 minutos"
+                description = "Live World Cup scores every 5 minutes"
                 enableVibration(true)
             }
             context.getSystemService(NotificationManager::class.java)
@@ -143,7 +143,7 @@ class LiveMatchNotifier @Inject constructor(
             textSize = 34f
             typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
         }
-        canvas.drawText("EN VIVO", pill.left + 66f, pill.centerY() + 12f, pillText)
+        canvas.drawText("LIVE", pill.left + 82f, pill.centerY() + 12f, pillText)
 
         drawFlag(canvas, homeFlag, centerX = 190f, centerY = 235f)
         drawFlag(canvas, awayFlag, centerX = width - 190f, centerY = 235f)
@@ -212,14 +212,14 @@ class LiveMatchNotifier @Inject constructor(
         countryCode?.uppercase() ?: name.take(3).uppercase()
 
     private fun String?.toStageDisplay(): String = when (this) {
-        "GROUP_STAGE" -> "Fase de grupos"
-        "LAST_32" -> "Dieciseisavos de final"
-        "LAST_16", "ROUND_OF_16" -> "Octavos de final"
-        "QUARTER_FINALS" -> "Cuartos de final"
-        "SEMI_FINALS" -> "Semifinal"
-        "THIRD_PLACE" -> "Tercer puesto"
+        "GROUP_STAGE" -> "Group stage"
+        "LAST_32" -> "Round of 32"
+        "LAST_16", "ROUND_OF_16" -> "Round of 16"
+        "QUARTER_FINALS" -> "Quarter-finals"
+        "SEMI_FINALS" -> "Semi-finals"
+        "THIRD_PLACE" -> "Third place"
         "FINAL" -> "Final"
-        null -> "Partido en vivo"
+        null -> "Live match"
         else -> replace('_', ' ').lowercase().replaceFirstChar { it.uppercase() }
     }
 
