@@ -12,8 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -34,7 +37,9 @@ import com.example.worldcupexplorer.ui.theme.WorldCupGreen
 @Composable
 fun AboutScreen(
     uiState: UiState<AboutUiModel>,
-    onRetry: () -> Unit
+    syncStatus: SyncStatus,
+    onRetry: () -> Unit,
+    onSyncNow: () -> Unit
 ) {
     AppBackground {
         Scaffold(
@@ -75,9 +80,12 @@ fun AboutScreen(
                             lines = listOf(
                                 "Jetpack Compose · Material 3",
                                 "MVVM · Hilt · Room · Retrofit",
-                                "Firebase Cloud Messaging"
+                                "Firebase Cloud Messaging · WorkManager"
                             )
                         )
+                    }
+                    item {
+                        SyncNowCard(syncStatus = syncStatus, onSyncNow = onSyncNow)
                     }
                 }
             }
@@ -126,4 +134,77 @@ private fun AboutCard(
             }
         }
     }
+}
+
+@Composable
+private fun SyncNowCard(
+    syncStatus: SyncStatus,
+    onSyncNow: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(14.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(46.dp)
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(WorldCupBlue.copy(alpha = 0.12f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = "🔄", style = MaterialTheme.typography.titleLarge)
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(text = "Background sync", style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        text = "WorkManager refreshes data and checks live matches",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            Text(
+                text = syncStatus.toStatusLabel(),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Button(
+                onClick = onSyncNow,
+                enabled = syncStatus != SyncStatus.Running,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = WorldCupBlue)
+            ) {
+                if (syncStatus == SyncStatus.Running) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp),
+                        color = Color.White,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text("Sync now")
+                }
+            }
+        }
+    }
+}
+
+private fun SyncStatus.toStatusLabel(): String = when (this) {
+    SyncStatus.Idle -> "No sync running yet."
+    SyncStatus.Running -> "Syncing data and checking live matches…"
+    is SyncStatus.Success -> if (liveMatches > 0) {
+        "Synced · $liveMatches live match notification(s) sent."
+    } else {
+        "Synced · no live matches right now."
+    }
+    SyncStatus.Failed -> "Sync failed, will retry automatically."
 }

@@ -133,8 +133,10 @@ class FootballRepositoryImpl @Inject constructor(
         ) { it }
     }
 
-    private suspend fun refreshAllCachedData() {
-        syncMutex.withLock {
+    override suspend fun syncNow(): Result<Unit> = refreshAllCachedData()
+
+    private suspend fun refreshAllCachedData(): Result<Unit> {
+        return syncMutex.withLock {
             runCatching {
                 val competitionResponse = remoteDataSource.getWorldCupCompetition()
                 val teamsResponse = remoteDataSource.getWorldCupTeams()

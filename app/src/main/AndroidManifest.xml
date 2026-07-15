@@ -36,13 +36,22 @@
             </intent-filter>
         </service>
 
-        <receiver
-            android:name=".notifications.LiveMatchCheckReceiver"
-            android:exported="false" />
-
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="world_cup_channel" />
+
+        <!-- WorkManager se inicializa bajo demanda usando WorldCupExplorerApplication
+             (Configuration.Provider) para poder inyectar HiltWorkerFactory. -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
     </application>
 
 </manifest>

@@ -17,9 +17,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
 import com.example.worldcupexplorer.navigation.AppDestination
 import com.example.worldcupexplorer.navigation.AppNavGraph
-import com.example.worldcupexplorer.notifications.LiveMatchScheduler
 import com.example.worldcupexplorer.notifications.NotificationHelper
 import com.example.worldcupexplorer.ui.theme.WorldCupExplorerTheme
+import com.example.worldcupexplorer.work.BackgroundSyncScheduler
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -27,7 +27,7 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
 
     @Inject
-    lateinit var liveMatchScheduler: LiveMatchScheduler
+    lateinit var backgroundSyncScheduler: BackgroundSyncScheduler
 
     private var pendingRoute by mutableStateOf<String?>(null)
 
@@ -72,8 +72,9 @@ class MainActivity : ComponentActivity() {
             PackageManager.PERMISSION_GRANTED
 
     private fun startLiveMatchChecks() {
-        liveMatchScheduler.start(
-            simulateFirstCheck = intent.getBooleanExtra(EXTRA_SIMULATE_LIVE_CHECK, false)
+        backgroundSyncScheduler.schedulePeriodicLiveMatchCheck()
+        backgroundSyncScheduler.runSyncNowChain(
+            simulateLiveMatch = intent.getBooleanExtra(EXTRA_SIMULATE_LIVE_CHECK, false)
         )
     }
 

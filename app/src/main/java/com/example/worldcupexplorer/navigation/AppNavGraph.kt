@@ -121,9 +121,12 @@ fun AppNavGraph(
                 composable(AppDestination.AboutRoute) {
                     val viewModel: AboutViewModel = hiltViewModel()
                     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+                    val syncStatus = viewModel.syncStatus.collectAsStateWithLifecycle().value
                     AboutScreen(
                         uiState = uiState,
-                        onRetry = viewModel::loadAbout
+                        syncStatus = syncStatus,
+                        onRetry = viewModel::loadAbout,
+                        onSyncNow = viewModel::syncNow
                     )
                 }
             }

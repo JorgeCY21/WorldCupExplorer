@@ -17,4 +17,5 @@ interface FootballRepository {
     fun getStandings(): Flow<Result<List<StandingGroup>>>
     fun getScorers(): Flow<Result<List<Scorer>>>
     fun getHomeDashboard(): Flow<Result<HomeDashboard>>
+    suspend fun syncNow(): Result<Unit>
 }

@@ -4,22 +4,33 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.worldcupexplorer.domain.repository.FootballRepository
 import com.example.worldcupexplorer.presentation.common.UiState
+import com.example.worldcupexplorer.work.BackgroundSyncScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @HiltViewModel
 class AboutViewModel @Inject constructor(
-    private val repository: FootballRepository
+    private val repository: FootballRepository,
+    private val backgroundSyncScheduler: BackgroundSyncScheduler
 ) : ViewModel() {
 
     private var loadJob: Job? = null
     private val _uiState = MutableStateFlow<UiState<AboutUiModel>>(UiState.Loading)
     val uiState: StateFlow<UiState<AboutUiModel>> = _uiState.asStateFlow()
+
+    // La UI observa el WorkInfo de la cadena DataSyncWorker -> LiveMatchCheckWorker
+    // sin conocer nada de WorkManager: queda desacoplada del trabajo en segundo plano.
+    val syncStatus: StateFlow<SyncStatus> = backgroundSyncScheduler.observeSyncChainStatus()
+        .map { it.toSyncStatus() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SyncStatus.Idle)
 
     init {
         loadAbout()
@@ -47,5 +58,9 @@ class AboutViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    fun syncNow() {
+        backgroundSyncScheduler.runSyncNowChain()
     }
 }
